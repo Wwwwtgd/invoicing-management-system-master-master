@@ -1,0 +1,668 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : local
+ Source Server Type    : MySQL
+ Source Server Version : 80018
+ Source Host           : 127.0.0.1:3306
+ Source Schema         : lzj_jxc
+
+ Target Server Type    : MySQL
+ Target Server Version : 80018
+ File Encoding         : 65001
+
+ Date: 10/03/2021 16:16:17
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for persistent_logins
+-- ----------------------------
+DROP TABLE IF EXISTS `persistent_logins`;
+CREATE TABLE `persistent_logins`  (
+  `username` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `series` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `token` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `last_used` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`series`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of persistent_logins
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_customer
+-- ----------------------------
+DROP TABLE IF EXISTS `t_customer`;
+CREATE TABLE `t_customer`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `address` varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '客户地址',
+  `contact` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '联系人',
+  `name` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '客户名称',
+  `number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '客户联系电话',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `is_del` int(11) NULL DEFAULT NULL COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '客户表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_customer
+-- ----------------------------
+INSERT INTO `t_customer` VALUES (1, '福州新弯曲5号', '小李子', '福州艾玛超市', '2132-23213421', '', 0);
+INSERT INTO `t_customer` VALUES (2, '天津兴达大街888号', '小张', '天津王大连锁酒店', '23432222311', '优质客户', 0);
+INSERT INTO `t_customer` VALUES (3, '大凉山妥洛村', '小爱', '大凉山希望小学', '233243211', '照顾客户2', 1);
+INSERT INTO `t_customer` VALUES (4, '南通通州新金路888号', '王二小', '南通通州综艺集团', '1832132321', '', 1);
+-- ----------------------------
+-- Table structure for t_customer_return_list
+-- ----------------------------
+DROP TABLE IF EXISTS `t_customer_return_list`;
+CREATE TABLE `t_customer_return_list`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `amount_paid` float NOT NULL COMMENT '实付金额',
+  `amount_payable` float NOT NULL COMMENT '应付金额',
+  `customer_return_date` datetime(0) NULL DEFAULT NULL COMMENT '退货日期',
+  `customer_return_number` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '退货单号',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `state` int(11) NULL DEFAULT NULL COMMENT '交易状态',
+  `user_id` int(11) NULL DEFAULT NULL COMMENT '操作用户',
+  `customer_id` int(11) NULL DEFAULT NULL COMMENT '客户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKd55ju83f0ntixagdvdrsmw10c`(`user_id`) USING BTREE,
+  INDEX `FKl0ahdwa8slkocbfe57opembfx`(`customer_id`) USING BTREE,
+  CONSTRAINT `FKd55ju83f0ntixagdvdrsmw10c` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKl0ahdwa8slkocbfe57opembfx` FOREIGN KEY (`customer_id`) REFERENCES `t_customer` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '客户退货单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_customer_return_list
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_customer_return_list_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_customer_return_list_goods`;
+CREATE TABLE `t_customer_return_list_goods`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品编码',
+  `model` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品型号',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
+  `num` int(11) NOT NULL COMMENT '数量',
+  `price` float NOT NULL COMMENT '价格',
+  `total` float NOT NULL COMMENT '总价',
+  `unit` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '单位',
+  `customer_return_list_id` int(11) NULL DEFAULT NULL COMMENT '客户退货id',
+  `type_id` int(11) NULL DEFAULT NULL COMMENT '商品类别',
+  `goods_id` int(11) NULL DEFAULT NULL COMMENT '商品id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKtqt67mbn96lxn8hvtl4piblhi`(`customer_return_list_id`) USING BTREE,
+  INDEX `FK4sm5si4swbj3gae46jfk441yx`(`type_id`) USING BTREE,
+  CONSTRAINT `FK4sm5si4swbj3gae46jfk441yx` FOREIGN KEY (`type_id`) REFERENCES `t_goods_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKtqt67mbn96lxn8hvtl4piblhi` FOREIGN KEY (`customer_return_list_id`) REFERENCES `t_customer_return_list` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '客户退货单商品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_customer_return_list_goods
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_damage_list
+-- ----------------------------
+DROP TABLE IF EXISTS `t_damage_list`;
+CREATE TABLE `t_damage_list`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `damage_date` datetime(0) NULL DEFAULT NULL COMMENT '报损日期',
+  `damage_number` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '报损单号',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `user_id` int(11) NULL DEFAULT NULL COMMENT '操作用户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKpn094ma69sch1icjc2gu7xus`(`user_id`) USING BTREE,
+  CONSTRAINT `FKpn094ma69sch1icjc2gu7xus` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '报损单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_damage_list
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_damage_list_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_damage_list_goods`;
+CREATE TABLE `t_damage_list_goods`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品编码',
+  `model` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '型号',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
+  `num` int(11) NOT NULL COMMENT '数量',
+  `price` float NOT NULL COMMENT '价格',
+  `total` float NOT NULL COMMENT '总价',
+  `unit` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '单位',
+  `damage_list_id` int(11) NULL DEFAULT NULL COMMENT '报损单id',
+  `type_id` int(11) NULL DEFAULT NULL COMMENT '商品类别id',
+  `goods_id` int(11) NULL DEFAULT NULL COMMENT '商品id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKbf5m8mm3gctrnuubr9xkjamj8`(`damage_list_id`) USING BTREE,
+  INDEX `FKdbdfmp09hlf2raktincwroe9n`(`type_id`) USING BTREE,
+  CONSTRAINT `FKbf5m8mm3gctrnuubr9xkjamj8` FOREIGN KEY (`damage_list_id`) REFERENCES `t_damage_list` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKdbdfmp09hlf2raktincwroe9n` FOREIGN KEY (`type_id`) REFERENCES `t_goods_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '报损单商品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_damage_list_goods
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_goods`;
+CREATE TABLE `t_goods`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品编码',
+  `inventory_quantity` int(11) NOT NULL COMMENT '库存数量',
+  `min_num` int(11) NOT NULL COMMENT '库存下限',
+  `model` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品型号',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
+  `producer` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '生产产商',
+  `purchasing_price` float NOT NULL COMMENT '采购价格',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `selling_price` float NOT NULL COMMENT '出售价格',
+  `unit` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品单位',
+  `type_id` int(11) NULL DEFAULT NULL COMMENT '商品类别',
+  `state` int(11) NOT NULL COMMENT '商品状态',
+  `last_purchasing_price` float NOT NULL COMMENT '上次采购价格',
+  `is_del` int(11) NULL DEFAULT NULL COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKlxnna5ngumghp4f279mmbjtyo`(`type_id`) USING BTREE,
+  CONSTRAINT `FKlxnna5ngumghp4f279mmbjtyo` FOREIGN KEY (`type_id`) REFERENCES `t_goods_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '商品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_goods
+-- ----------------------------
+INSERT INTO `t_goods` VALUES (1, '0001', 175, 1000, '红色装', '陶华碧老干妈香辣脆油辣椒', '贵州省贵阳南明老干妈风味食品有限公司', 6.32, '好卖', 8.5, '13', 10, 2, 8.5, 0);
+INSERT INTO `t_goods` VALUES (2, '0002', 142, 400, 'Note8', '华为荣耀Note8', '华为计算机系统有限公司', 1950.05, '热销', 2200, '5', 16, 2, 2220, 0);
+INSERT INTO `t_goods` VALUES (11, '0003', 2897, 400, '500g装', '野生东北黑木耳', '辉南县博康土特产有限公司', 23, '够黑2', 38, '2', 11, 2, 23, 0);
+INSERT INTO `t_goods` VALUES (12, '0004', 326, 300, '2斤装', '新疆红枣', '沧州铭鑫食品有限公司', 13, '好吃', 25, '2', 10, 2, 13, 0);
+INSERT INTO `t_goods` VALUES (13, '0005', 53, 1000, '散装500克', '麦片燕麦巧克力', '福建省麦德好食品工业有限公司', 8, 'Goods', 15, '2', 11, 2, 8, 0);
+INSERT INTO `t_goods` VALUES (14, '0006', 36, 1999, '300g装', '冰糖金桔干', '揭西县同心食品有限公司', 5.1, '', 13, '3', 11, 2, 5, 0);
+INSERT INTO `t_goods` VALUES (15, '0007', 100651, 400, '500g装', '吉利人家牛肉味蛋糕', '合肥吉利人家食品有限公司', 4.5, 'good', 10, '2', 11, 2, 4.5, 0);
+INSERT INTO `t_goods` VALUES (16, '0008', 196, 500, '128g装', '奕森奶油桃肉蜜饯果脯果干桃肉干休闲零食品', '潮州市潮安区正大食品有限公司', 3, '', 10, '3', 11, 2, 3, 0);
+INSERT INTO `t_goods` VALUES (17, '0009', 365, 1000, '240g装', '休闲零食坚果特产精品干果无漂白大个开心果', '石家庄博群食品有限公司', 20, '', 33, '2', 11, 2, 20, 0);
+INSERT INTO `t_goods` VALUES (18, '0010', 10, 300, '250g装', '劲仔小鱼干', '湖南省华文食品有限公司', 12, '', 20, '2', 11, 2, 12, 0);
+INSERT INTO `t_goods` VALUES (19, '0011', 11, 300, '198g装', '山楂条', '临朐县七贤升利食品厂', 3.2, '', 10, '2', 11, 0, 3.2, 0);
+INSERT INTO `t_goods` VALUES (20, '0012', 22, 200, '500g装', '大乌梅干', '长春市鼎丰真食品有限责任公司', 20, '', 25, '2', 11, 0, 20, 0);
+INSERT INTO `t_goods` VALUES (21, '0013', 400, 100, '250g装', '手工制作芝麻香酥麻通', '桂林兰雨食品有限公司', 3, '', 8, '2', 11, 2, 3, 0);
+INSERT INTO `t_goods` VALUES (22, '0014', 12, 200, '250g装', '美国青豆原味 蒜香', '菲律宾', 5, '', 8, '2', 11, 2, 5, 0);
+INSERT INTO `t_goods` VALUES (24, '0015', -3, 100, 'X', ' iPhone X', 'xx2', 8000, 'xxx2', 9500, '5', 16, 2, 8000, 0);
+INSERT INTO `t_goods` VALUES (26, '0017', -1, 100, 'ILCE-A6000L', 'Sony/索尼 ILCE-A6000L WIFI微单数码相机高清单电', 'xxx', 3000, 'xxx', 3650, '5', 15, 2, 3000, 0);
+INSERT INTO `t_goods` VALUES (27, '0018', -1, 400, 'IXUS 285 HS', 'Canon/佳能 IXUS 285 HS 数码相机 2020万像素高清拍摄', 'xx', 800, 'xxx', 1299, '5', 15, 2, 800, 0);
+INSERT INTO `t_goods` VALUES (28, '0019', 100, 300, 'Q8', 'Golden Field/金河田 Q8电脑音响台式多媒体家用音箱低音炮重低音', 'xxxx', 60, '', 129, '5', 17, 0, 60, 0);
+INSERT INTO `t_goods` VALUES (29, '0020', 0, 50, '190WDPT', 'Haier/海尔冰箱BCD-190WDPT双门电冰箱大两门冷藏冷冻', 'cc', 1000, '', 1699, '5', 14, 0, 1000, 0);
+INSERT INTO `t_goods` VALUES (30, '0021', 0, 320, '4A ', 'Xiaomi/小米 小米电视4A 32英寸 智能液晶平板电视机', 'cc', 700, '', 1199, '5', 12, 0, 700, 0);
+INSERT INTO `t_goods` VALUES (31, '0022', 0, 40, 'XQB55-36SP', 'TCL XQB55-36SP 5.5公斤全自动波轮迷你小型洗衣机家用单脱抗菌', 'cc', 400, '', 729, '5', 13, 0, 400, 0);
+INSERT INTO `t_goods` VALUES (32, '0023', 0, 1000, '80g*2', '台湾进口膨化零食品张君雅小妹妹日式串烧丸子80g*2', 'cc', 4, '', 15, '2', 9, 0, 4, 0);
+INSERT INTO `t_goods` VALUES (33, '0024', 0, 10, 'A字裙', '卓图女装立领针织格子印花拼接高腰A字裙2017秋冬新款碎花连衣裙', 'cc', 168, '', 298, '11', 6, 0, 168, 0);
+INSERT INTO `t_goods` VALUES (34, '0025', 0, 10, '三件套秋', '西服套装男三件套秋季新款商务修身职业正装男士西装新郎结婚礼服', 'cc', 189, '', 299, '11', 7, 0, 189, 0);
+INSERT INTO `t_goods` VALUES (35, '0026', 0, 10, 'AFS JEEP', '加绒加厚正品AFS JEEP/战地吉普男大码长裤植绒保暖男士牛仔裤子', 'c', 60, '', 89, '12', 8, 0, 60, 0);
+INSERT INTO `t_goods` VALUES (38, '0027', 0, 10, 'xxl', '男士马甲453455', '海澜之家', 50, '', 200, '1', 7, 0, 0, 0);
+
+-- ----------------------------
+-- Table structure for t_goods_type
+-- ----------------------------
+DROP TABLE IF EXISTS `t_goods_type`;
+CREATE TABLE `t_goods_type`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '类别名',
+  `p_id` int(11) NULL DEFAULT NULL COMMENT '父级类别id',
+  `state` int(11) NULL DEFAULT NULL COMMENT '节点类型',
+  `icon` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '节点图标',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '商品类别表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_goods_type
+-- ----------------------------
+INSERT INTO `t_goods_type` VALUES (1, '所有类别', -1, 1, 'icon-folderOpen');
+INSERT INTO `t_goods_type` VALUES (2, '服饰', 1, 1, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (3, '食品', 1, 1, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (4, '家电', 1, 1, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (5, '数码', 1, 1, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (6, '连衣裙', 2, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (7, '男士西装', 2, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (8, '牛仔裤', 2, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (9, '进口食品', 3, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (10, '地方特产', 3, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (11, '休闲食品', 3, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (12, '电视机', 4, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (13, '洗衣机', 4, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (14, '冰箱', 4, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (15, '相机', 5, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (16, '手机', 5, 0, 'icon-folder');
+INSERT INTO `t_goods_type` VALUES (17, '音箱', 5, 0, 'icon-folder');
+
+-- ----------------------------
+-- Table structure for t_goods_unit
+-- ----------------------------
+DROP TABLE IF EXISTS `t_goods_unit`;
+CREATE TABLE `t_goods_unit`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '单位名',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '商品单位表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_goods_unit
+-- ----------------------------
+INSERT INTO `t_goods_unit` VALUES (1, '个');
+INSERT INTO `t_goods_unit` VALUES (2, '袋');
+INSERT INTO `t_goods_unit` VALUES (3, '盒');
+INSERT INTO `t_goods_unit` VALUES (4, '箱');
+INSERT INTO `t_goods_unit` VALUES (5, '台');
+INSERT INTO `t_goods_unit` VALUES (6, '包');
+INSERT INTO `t_goods_unit` VALUES (11, '件');
+INSERT INTO `t_goods_unit` VALUES (12, '条');
+INSERT INTO `t_goods_unit` VALUES (13, '瓶');
+
+-- ----------------------------
+-- Table structure for t_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_log`;
+CREATE TABLE `t_log`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `time` datetime(0) NULL DEFAULT NULL,
+  `type` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `user_id` int(11) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKbvn5yabu3vqwvtjoh32i9r4ip`(`user_id`) USING BTREE,
+  CONSTRAINT `FKbvn5yabu3vqwvtjoh32i9r4ip` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_log
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_menu
+-- ----------------------------
+DROP TABLE IF EXISTS `t_menu`;
+CREATE TABLE `t_menu`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `icon` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '菜单图标',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '菜单名称',
+  `state` int(11) NULL DEFAULT NULL COMMENT '节点类型',
+  `url` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '菜单url',
+  `p_id` int(11) NULL DEFAULT NULL COMMENT '上级菜单id',
+  `acl_value` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '权限码',
+  `grade` int(255) NULL DEFAULT NULL COMMENT '菜单层级',
+  `is_del` int(11) NULL DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKsni20f28wjqrmpp44uawa2ky4`(`p_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '菜单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_menu
+-- ----------------------------
+INSERT INTO `t_menu` VALUES (1, 'menu-1', '系统菜单', 1, '/', -1, '2099', -1, 0);
+INSERT INTO `t_menu` VALUES (2, 'menu-2', '系统设置', 0, '/', 1, '10', 0, 0);
+INSERT INTO `t_menu` VALUES (3, 'menu-3', '用户管理', 0, '/user/index', 2, '1010', 1, 0);
+INSERT INTO `t_menu` VALUES (4, 'menu-4', '角色管理', 0, '/role/index', 2, '1020', 1, 0);
+INSERT INTO `t_menu` VALUES (5, 'menu-5', '密码修改', 0, '/user/toPasswordPage', 2, '101001', 2, 0);
+INSERT INTO `t_menu` VALUES (6, 'menu-6', '安全退出', 0, '/signout', 2, '101002', 2, 0);
+INSERT INTO `t_menu` VALUES (7, NULL, '用户列表查询', 0, NULL, 3, '101003', 2, 0);
+INSERT INTO `t_menu` VALUES (8, NULL, '用户添加', 0, NULL, 3, '101004', 2, 0);
+INSERT INTO `t_menu` VALUES (9, NULL, '用户更新', 0, NULL, 3, '101005', 2, 0);
+INSERT INTO `t_menu` VALUES (10, NULL, '用户删除', 0, NULL, 3, '101006', 2, 0);
+INSERT INTO `t_menu` VALUES (11, NULL, '角色列表查询', 0, NULL, 4, '102001', 2, 0);
+INSERT INTO `t_menu` VALUES (12, NULL, '角色添加', 0, NULL, 4, '102002', 2, 0);
+INSERT INTO `t_menu` VALUES (13, NULL, '角色更新', 0, NULL, 4, '102003', 2, 0);
+INSERT INTO `t_menu` VALUES (14, NULL, '角色删除', 0, NULL, 4, '102004', 2, 0);
+INSERT INTO `t_menu` VALUES (15, NULL, '角色授权', 0, NULL, 4, '102005', 2, 0);
+
+-- ----------------------------
+-- Table structure for t_overflow_list
+-- ----------------------------
+DROP TABLE IF EXISTS `t_overflow_list`;
+CREATE TABLE `t_overflow_list`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `overflow_date` datetime(0) NULL DEFAULT NULL COMMENT '报溢日期',
+  `overflow_number` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '报溢单号',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `user_id` int(11) NULL DEFAULT NULL COMMENT '操作用户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK3bu8hj2xniqwbrtg6ls6b8ej2`(`user_id`) USING BTREE,
+  CONSTRAINT `FK3bu8hj2xniqwbrtg6ls6b8ej2` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '报溢单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_overflow_list
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_overflow_list_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_overflow_list_goods`;
+CREATE TABLE `t_overflow_list_goods`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '编码',
+  `model` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '型号',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名',
+  `num` int(11) NOT NULL COMMENT '数量',
+  `price` float NOT NULL COMMENT '价格',
+  `total` float NOT NULL COMMENT '总价',
+  `unit` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '单位',
+  `overflow_list_id` int(11) NULL DEFAULT NULL COMMENT '报溢单id',
+  `type_id` int(11) NULL DEFAULT NULL COMMENT '商品类别id',
+  `goods_id` int(11) NULL DEFAULT NULL COMMENT '商品id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKd3s9761mgl456tn2xb0d164h7`(`overflow_list_id`) USING BTREE,
+  INDEX `FK8t46iik5kpciki8fnqtiuq5q3`(`type_id`) USING BTREE,
+  CONSTRAINT `FK8t46iik5kpciki8fnqtiuq5q3` FOREIGN KEY (`type_id`) REFERENCES `t_goods_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKd3s9761mgl456tn2xb0d164h7` FOREIGN KEY (`overflow_list_id`) REFERENCES `t_overflow_list` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '报溢单商品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_overflow_list_goods
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_purchase_list
+-- ----------------------------
+DROP TABLE IF EXISTS `t_purchase_list`;
+CREATE TABLE `t_purchase_list`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `amount_paid` float NOT NULL COMMENT '实付金额',
+  `amount_payable` float NOT NULL COMMENT '应付金额',
+  `purchase_date` datetime(0) NULL DEFAULT NULL COMMENT '进货日期',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `state` int(11) NOT NULL COMMENT '交易状态',
+  `purchase_number` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '进货单号',
+  `supplier_id` int(11) NULL DEFAULT NULL COMMENT '供应商',
+  `user_id` int(11) NULL DEFAULT NULL COMMENT '操作用户',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK5j2dev8b2b5d0l69nb8vtr4yb`(`supplier_id`) USING BTREE,
+  INDEX `FK69s6eyxr4wwvsywe9hbthef1h`(`user_id`) USING BTREE,
+  CONSTRAINT `FK5j2dev8b2b5d0l69nb8vtr4yb` FOREIGN KEY (`supplier_id`) REFERENCES `t_supplier` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK69s6eyxr4wwvsywe9hbthef1h` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '进货单' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_purchase_list
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_purchase_list_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_purchase_list_goods`;
+CREATE TABLE `t_purchase_list_goods`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品编码',
+  `model` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品型号',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
+  `num` int(11) NOT NULL COMMENT '数量',
+  `price` float NOT NULL COMMENT '单价',
+  `total` float NOT NULL COMMENT '总价',
+  `unit` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品单位',
+  `purchase_list_id` int(11) NULL DEFAULT NULL COMMENT '进货单id',
+  `type_id` int(11) NULL DEFAULT NULL COMMENT '商品类别',
+  `goods_id` int(11) NULL DEFAULT NULL COMMENT '商品id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKfvdvgcebqkkokyn0o00idqnpy`(`purchase_list_id`) USING BTREE,
+  INDEX `FK83ikbi2x3epn49fwcco8jlfwu`(`type_id`) USING BTREE,
+  CONSTRAINT `FK83ikbi2x3epn49fwcco8jlfwu` FOREIGN KEY (`type_id`) REFERENCES `t_goods_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKfvdvgcebqkkokyn0o00idqnpy` FOREIGN KEY (`purchase_list_id`) REFERENCES `t_purchase_list` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '进货单商品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_purchase_list_goods
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_return_list
+-- ----------------------------
+DROP TABLE IF EXISTS `t_return_list`;
+CREATE TABLE `t_return_list`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `amount_paid` float NOT NULL COMMENT '实付金额',
+  `amount_payable` float NOT NULL COMMENT '应付金额',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `return_date` datetime(0) NULL DEFAULT NULL COMMENT '退货日期',
+  `return_number` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '退货单号',
+  `state` int(11) NOT NULL COMMENT '交易状态',
+  `supplier_id` int(11) NULL DEFAULT NULL COMMENT '供应商',
+  `user_id` int(11) NULL DEFAULT NULL COMMENT '操作用户',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK4qxjj8bvj2etne243xluni0vn`(`supplier_id`) USING BTREE,
+  INDEX `FK904juw2v1hm2av0ig26gae9jb`(`user_id`) USING BTREE,
+  CONSTRAINT `FK4qxjj8bvj2etne243xluni0vn` FOREIGN KEY (`supplier_id`) REFERENCES `t_supplier` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK904juw2v1hm2av0ig26gae9jb` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '退货单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_return_list
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_return_list_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_return_list_goods`;
+CREATE TABLE `t_return_list_goods`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品编码',
+  `model` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品型号',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
+  `num` int(11) NOT NULL COMMENT '数量',
+  `price` float NOT NULL COMMENT '单价',
+  `total` float NOT NULL COMMENT '总价',
+  `unit` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '单位',
+  `return_list_id` int(11) NULL DEFAULT NULL COMMENT '退货单id',
+  `type_id` int(11) NULL DEFAULT NULL COMMENT '商品类别',
+  `goods_id` int(11) NULL DEFAULT NULL COMMENT '商品id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKemclu281vyvyk063c3foafq1w`(`return_list_id`) USING BTREE,
+  INDEX `FKa1prpd96fcs0x2oe0omny9vio`(`type_id`) USING BTREE,
+  CONSTRAINT `FKa1prpd96fcs0x2oe0omny9vio` FOREIGN KEY (`type_id`) REFERENCES `t_goods_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKemclu281vyvyk063c3foafq1w` FOREIGN KEY (`return_list_id`) REFERENCES `t_return_list` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '退货单商品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_return_list_goods
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_role
+-- ----------------------------
+DROP TABLE IF EXISTS `t_role`;
+CREATE TABLE `t_role`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `bz` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '角色名',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述',
+  `is_del` int(11) UNSIGNED NULL DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_role
+-- ----------------------------
+INSERT INTO `t_role` VALUES (1, '系统管理员 最高权限', '管理员', NULL, 0);
+INSERT INTO `t_role` VALUES (2, '主管', '主管', NULL, 0);
+INSERT INTO `t_role` VALUES (4, '采购员', '采购员', NULL, 0);
+INSERT INTO `t_role` VALUES (5, '销售经理', '销售经理', '', 0);
+INSERT INTO `t_role` VALUES (6, '仓库管理员', '仓库管理员', NULL, 0);
+
+
+-- ----------------------------
+-- Table structure for t_role_menu
+-- ----------------------------
+DROP TABLE IF EXISTS `t_role_menu`;
+CREATE TABLE `t_role_menu`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `menu_id` int(11) NULL DEFAULT NULL COMMENT '菜单id',
+  `role_id` int(11) NULL DEFAULT NULL COMMENT '角色id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKsonb0rbt2u99hbrqqvv3r0wse`(`role_id`) USING BTREE,
+  INDEX `FKhayg4ib6v7h1wyeyxhq6xlddq`(`menu_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 148 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色菜单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_role_menu
+-- ----------------------------
+INSERT INTO `t_role_menu` VALUES (134, 1, 1);
+INSERT INTO `t_role_menu` VALUES (135, 2, 1);
+INSERT INTO `t_role_menu` VALUES (136, 3, 1);
+INSERT INTO `t_role_menu` VALUES (137, 7, 1);
+INSERT INTO `t_role_menu` VALUES (138, 8, 1);
+INSERT INTO `t_role_menu` VALUES (139, 9, 1);
+INSERT INTO `t_role_menu` VALUES (140, 10, 1);
+INSERT INTO `t_role_menu` VALUES (141, 4, 1);
+INSERT INTO `t_role_menu` VALUES (142, 11, 1);
+INSERT INTO `t_role_menu` VALUES (143, 12, 1);
+INSERT INTO `t_role_menu` VALUES (144, 13, 1);
+INSERT INTO `t_role_menu` VALUES (145, 14, 1);
+INSERT INTO `t_role_menu` VALUES (146, 15, 1);
+INSERT INTO `t_role_menu` VALUES (147, 5, 1);
+INSERT INTO `t_role_menu` VALUES (148, 6, 1);
+
+-- ----------------------------
+-- Table structure for t_sale_list
+-- ----------------------------
+DROP TABLE IF EXISTS `t_sale_list`;
+CREATE TABLE `t_sale_list`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `amount_paid` float NOT NULL COMMENT '实付金额',
+  `amount_payable` float NOT NULL COMMENT '应付金额',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `sale_date` datetime(0) NULL DEFAULT NULL COMMENT '销售日期',
+  `sale_number` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '销售单号',
+  `state` int(11) NULL DEFAULT NULL COMMENT '交易状态',
+  `user_id` int(11) NULL DEFAULT NULL COMMENT '操作用户',
+  `customer_id` int(11) NULL DEFAULT NULL COMMENT '客户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK34bnujemrdqimbhg133enp8k8`(`user_id`) USING BTREE,
+  INDEX `FKox4qfs87eu3fvwdmrvelqhi8e`(`customer_id`) USING BTREE,
+  CONSTRAINT `FK34bnujemrdqimbhg133enp8k8` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKox4qfs87eu3fvwdmrvelqhi8e` FOREIGN KEY (`customer_id`) REFERENCES `t_customer` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '销售单表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_sale_list
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_sale_list_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_sale_list_goods`;
+CREATE TABLE `t_sale_list_goods`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品编码',
+  `model` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品型号',
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
+  `num` int(11) NOT NULL COMMENT '数量',
+  `price` float NOT NULL COMMENT '单价',
+  `total` float NOT NULL COMMENT '总价',
+  `unit` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '单位',
+  `sale_list_id` int(11) NULL DEFAULT NULL COMMENT '销售单',
+  `type_id` int(11) NULL DEFAULT NULL COMMENT '商品类别',
+  `goods_id` int(11) NULL DEFAULT NULL COMMENT '商品id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK20ehd6ta9geyql4hxtdsnhbox`(`sale_list_id`) USING BTREE,
+  INDEX `FKn9i5p1d8f0gek5x7q45cq8ibw`(`type_id`) USING BTREE,
+  CONSTRAINT `FK20ehd6ta9geyql4hxtdsnhbox` FOREIGN KEY (`sale_list_id`) REFERENCES `t_sale_list` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKn9i5p1d8f0gek5x7q45cq8ibw` FOREIGN KEY (`type_id`) REFERENCES `t_goods_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 0 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '销售单商品表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_sale_list_goods
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_supplier
+-- ----------------------------
+DROP TABLE IF EXISTS `t_supplier`;
+CREATE TABLE `t_supplier`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `address` varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '联系地址',
+  `contact` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '联系人',
+  `name` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '供应商名称',
+  `number` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '联系电话',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `is_del` int(11) NULL DEFAULT NULL COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '供应商表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_supplier
+-- ----------------------------
+INSERT INTO `t_supplier` VALUES (1, '上海市金山区张堰镇松金公路2072号6607室', '小张', '上海福桂食品有限公司', '0773-7217175', '失信供应商', 0);
+INSERT INTO `t_supplier` VALUES (2, '安徽省合肥市肥西县桃花工业园合派路', '小王', '安徽麦堡食品工业有限公司', '0773-7217275', NULL, 0);
+INSERT INTO `t_supplier` VALUES (3, '晋江市罗山后林西区41号', '小李', '福建省晋江市罗山惠康食品有限公司', '1273-1217175', '优质供应商', 0);
+INSERT INTO `t_supplier` VALUES (4, '南京市江宁区科学园竹山路565号1幢', '小丽', '南京含羞草食品有限公司', '2121-7217175', NULL, 0);
+INSERT INTO `t_supplier` VALUES (5, '南京市高淳县阳江镇新桥村下桥278号', '王大狗', '南京禾乃美工贸有限公司', '2133-7217125', NULL, 0);
+INSERT INTO `t_supplier` VALUES (6, '开平市水口镇东埠路６号', '小七', '开平广合腐乳有限公司', '3332-7217175', '2', 0);
+INSERT INTO `t_supplier` VALUES (7, '汕头市跃进路２３号利鸿基中心大厦写字楼２座', '刘钩子', '汕头市金茂食品有限公司', '0723-7232175', NULL, 0);
+INSERT INTO `t_supplier` VALUES (8, '南京市溧水区经济开发区', '七枷社', '南京喜之郎食品有限公司', '1773-7217175', NULL, 0);
+INSERT INTO `t_supplier` VALUES (9, '深圳市罗湖区翠竹北路中深石化区厂房B栋6楼', '小蔡', '深圳昌信实业有限公司', '1773-7217175', NULL, 0);
+INSERT INTO `t_supplier` VALUES (10, '南京市下关区金陵小区6村27-2-203室', '小路', '南京市下关区红鹰调味品商行', '2132-7217175', NULL, 0);
+INSERT INTO `t_supplier` VALUES (11, '荔浦县荔塔路１６－３６号', '亲亲', '桂林阜康食品工业有限公司', '2123-7217175', NULL, 0);
+INSERT INTO `t_supplier` VALUES (12, '南京鼓楼区世纪大楼123号', '小二', '南京大王科技', '0112-1426789', '123', 1);
+INSERT INTO `t_supplier` VALUES (13, '南京将军路800号', '小吴', '南京大陆食品公司', '1243-2135487', 'cc', 0);
+INSERT INTO `t_supplier` VALUES (14, '32423', 'test', 'test', '33', NULL, 0);
+INSERT INTO `t_supplier` VALUES (15, '杭州滨江', 'test', '男士马甲', '33', NULL, 0);
+
+-- ----------------------------
+-- Table structure for t_user
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user`;
+CREATE TABLE `t_user`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `bz` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注名',
+  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '密码',
+  `true_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '真实姓名',
+  `user_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户名',
+  `remarks` varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `is_del` int(11) NULL DEFAULT 0 COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_user
+-- ----------------------------
+INSERT INTO `t_user` VALUES (1, 'admin', '$2a$10$PSYNTHhzJdEERw6e9ge45upuKjdfLoHEXGingO3529NQqS8XyA2l.', '乐字节', 'admin', 'admin', 0);
+INSERT INTO `t_user` VALUES (2, '主管', '$2a$10$82VhQUlpNAK2M1P9XUuESed8.Sh3irIl8LGcrH13M3uAk6Bl5kor.', '乐字节', 'jack', '乐字节', 0);
+INSERT INTO `t_user` VALUES (3, '销售经理', '$2a$10$82VhQUlpNAK2M1P9XUuESed8.Sh3irIl8LGcrH13M3uAk6Bl5kor.', '玛丽', 'marry', '33', 1);
+
+-- ----------------------------
+-- Table structure for t_user_role
+-- ----------------------------
+DROP TABLE IF EXISTS `t_user_role`;
+CREATE TABLE `t_user_role`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `role_id` int(11) NULL DEFAULT NULL COMMENT '角色id',
+  `user_id` int(11) NULL DEFAULT NULL COMMENT '用户id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKa9c8iiy6ut0gnx491fqx4pxam`(`role_id`) USING BTREE,
+  INDEX `FKq5un6x7ecoef5w1n39cop66kl`(`user_id`) USING BTREE,
+  CONSTRAINT `FKa9c8iiy6ut0gnx491fqx4pxam` FOREIGN KEY (`role_id`) REFERENCES `t_role` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FKq5un6x7ecoef5w1n39cop66kl` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户角色表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_user_role
+-- ----------------------------
+INSERT INTO `t_user_role` VALUES (1, 1, 1);
+
+SET FOREIGN_KEY_CHECKS = 1;
